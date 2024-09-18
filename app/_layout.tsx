@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 
 export default function RootLayout() {
@@ -9,18 +9,19 @@ export default function RootLayout() {
     setNumber(prev => prev + num);
   };
 
-  const handleClear = () => {
-    setNumber('');
+  const handleDelete = () => {
+    setNumber(number.slice(0, -1));
   };
 
   const handleCall = () => {
-    alert(`Ligando para ${number}`);
+    Linking.openURL(`https://api.whatsapp.com/send/?phone=55${number}&text&type=phone_number&app_absent=0`)
+    .catch(err => console.error("Failed to open URL: ", err));
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.display}>
-        <Text style={styles.displayText}>{number || '0'}</Text>
+        <Text style={styles.displayText}>{number}</Text>
       </View>
       <View style={styles.buttonContainer}>
         {[1, 2, 3].map((item) => (
@@ -54,9 +55,11 @@ export default function RootLayout() {
         <TouchableOpacity style={styles.callButton} onPress={handleCall}>
           <FontAwesome name="phone" size={28} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
-        <MaterialIcons name="backspace" size={30} color="white" />
+        { number.length > 0 && (
+          <TouchableOpacity style={styles.clearButton} onPress={handleDelete}>
+         <MaterialIcons name="backspace" size={30} color="white" />
         </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -105,6 +108,7 @@ const styles = StyleSheet.create({
   actionButtons: {
     flexDirection: 'row',
     marginTop: 40,
+    height: 50,
     width: '90%',
     justifyContent: 'flex-end',
     alignItems: 'center'
